@@ -241,7 +241,7 @@ class ModeCheonjiin extends InputMode {
 	protected boolean loadEmojis() {
 		if (shouldDisplayEmojis()) {
 			suggestions.clear();
-			suggestions.addAll(new EmojiLanguage(seq).getKeyCharacters(digitSequence.charAt(digitSequence.length() - 1) - '0', getEmojiGroup()));
+			suggestions.addAll(new EmojiLanguage(seq, settings.useSimpleEmojiLoading()).getKeyCharacters(digitSequence.charAt(digitSequence.length() - 1) - '0', getEmojiGroup()));
 			return true;
 		}
 

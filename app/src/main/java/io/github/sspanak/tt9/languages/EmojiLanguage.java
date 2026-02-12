@@ -11,8 +11,13 @@ import io.github.sspanak.tt9.util.chars.Characters;
 
 public class EmojiLanguage extends Language {
 	private final Sequences seq;
+	private final boolean useSimpleLoading;
 
 	public EmojiLanguage(Sequences sequences) {
+		this(sequences, true);
+	}
+
+	public EmojiLanguage(Sequences sequences, boolean useSimpleLoading) {
 		id = Integer.parseInt(new Sequences().EMOJI_SEQUENCE); // always use the unprefixed sequence for ID
 		locale = Locale.ROOT;
 		abcString = "emoji";
@@ -20,6 +25,7 @@ public class EmojiLanguage extends Language {
 		currency = "";
 		name = "Emoji";
 		seq = sequences == null ? new Sequences() : sequences;
+		this.useSimpleLoading = useSimpleLoading;
 	}
 
 	@NonNull
@@ -30,7 +36,7 @@ public class EmojiLanguage extends Language {
 
 	@NonNull
 	public ArrayList<String> getKeyCharacters(int key, int characterGroup) {
-		return key == 1 && characterGroup >= 0 ? Characters.getEmoji(characterGroup) : new ArrayList<>();
+		return key == 1 && characterGroup >= 0 ? Characters.getEmoji(characterGroup, useSimpleLoading) : new ArrayList<>();
 	}
 
 	@NonNull

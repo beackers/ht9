@@ -69,11 +69,17 @@ class SettingsTyping extends SettingsPunctuation {
 	}
 
 	public OneKeyEmojiOptions.OPTIONS getOneKeyEmojiMode() {
+		String mode = prefs.getString(DropDownOneKeyEmoji.NAME, OneKeyEmojiOptions.DEFAULT);
+
 		try {
-			return OneKeyEmojiOptions.OPTIONS.valueOf(prefs.getString(DropDownOneKeyEmoji.NAME, OneKeyEmojiOptions.DEFAULT));
+			return OneKeyEmojiOptions.OPTIONS.valueOf(mode);
 		} catch (IllegalArgumentException e) {
 			return OneKeyEmojiOptions.OPTIONS.valueOf(OneKeyEmojiOptions.DEFAULT);
 		}
+	}
+
+	public boolean useSimpleEmojiLoading() {
+		return getOneKeyEmojiMode() == OneKeyEmojiOptions.OPTIONS.SIMPLE;
 	}
 
 	public boolean getPredictiveMode() {

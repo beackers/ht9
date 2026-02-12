@@ -10,6 +10,18 @@ import io.github.sspanak.tt9.util.TextTools;
 import io.github.sspanak.tt9.util.chars.Characters;
 
 public class EmojiLanguage extends Language {
+	private static final int PAGE_SIZE = 6;
+
+	public static class EmojiBrowseState {
+		public final int category;
+		public final int page;
+
+		public EmojiBrowseState(int category, int page) {
+			this.category = category;
+			this.page = page;
+		}
+	}
+
 	private final Sequences seq;
 
 	public EmojiLanguage(Sequences sequences) {
@@ -29,6 +41,29 @@ public class EmojiLanguage extends Language {
 	}
 
 	@NonNull
+	public ArrayList<String> getKeyCharacters(int key, @NonNull EmojiBrowseState state) {
+		if (key != 1 || state.category < 0) {
+			return new ArrayList<>();
+		}
+
+		ArrayList<String> categoryItems = Characters.getEmoji(state.category);
+		if (categoryItems.isEmpty()) {
+			return categoryItems;
+		}
+
+		int start = state.page * PAGE_SIZE;
+		if (start >= categoryItems.size()) {
+			start = 0;
+		}
+
+		int end = Math.min(categoryItems.size(), start + PAGE_SIZE);
+		return new ArrayList<>(categoryItems.subList(start, end));
+	}
+
+	/**
+	 * Legacy helper kept for brief-list mode compatibility.
+	 */
+	@NonNull
 	public ArrayList<String> getKeyCharacters(int key, int characterGroup) {
 		return key == 1 && characterGroup >= 0 ? Characters.getEmoji(characterGroup) : new ArrayList<>();
 	}
@@ -36,7 +71,7 @@ public class EmojiLanguage extends Language {
 	@NonNull
 	@Override
 	public ArrayList<String> getKeyCharacters(int key) {
-		return getKeyCharacters(key, 0);
+		return getKeyCharacters(key, new EmojiBrowseState(0, 0));
 	}
 
 	@Override
@@ -45,10 +80,55 @@ public class EmojiLanguage extends Language {
 	}
 
 	public static String validateEmojiSequence(@NonNull Sequences seq, @NonNull String sequence, int next) {
-		if (sequence.startsWith(seq.EMOJI_SEQUENCE) && (next > 1 || sequence.length() - seq.PUNCTUATION_PREFIX_LENGTH == Characters.getMaxEmojiLevel() + 1)) {
-			return sequence;
-		} else {
+		if (!sequence.startsWith(seq.EMOJI_SEQUENCE)) {
 			return sequence + next;
 		}
+
+		if (next != Sequences.CHARS_1_KEY) {
+			return sequence;
+		}
+
+		EmojiBrowseState state = getBrowseState(seq, sequence);
+		return toEmojiSequence(seq, state.category, state.page + 1);
+	}
+
+	@NonNull
+	public static String nextEmojiCategory(@NonNull Sequences seq, @NonNull String sequence) {
+		if (!sequence.startsWith(seq.EMOJI_SEQUENCE)) {
+			return sequence;
+		}
+
+		EmojiBrowseState state = getBrowseState(seq, sequence);
+		return toEmojiSequence(seq, state.category + 1, 0);
+	}
+
+	@NonNull
+	public static EmojiBrowseState getBrowseState(@NonNull Sequences seq, @NonNull String sequence) {
+		final int categoryCount = Math.max(1, Characters.getMaxEmojiLevel());
+
+		if (sequence.length() >= seq.EMOJI_SEQUENCE.length() + 2) {
+			int category = sequence.charAt(seq.EMOJI_SEQUENCE.length()) - '0';
+			int page = sequence.charAt(seq.EMOJI_SEQUENCE.length() + 1) - '0';
+			category = Math.floorMod(category, categoryCount);
+			page = Math.floorMod(page, getPageCount(category));
+			return new EmojiBrowseState(category, page);
+		}
+
+		int oldLevel = Math.max(0, sequence.length() - seq.EMOJI_SEQUENCE.length());
+		return new EmojiBrowseState(Math.floorMod(oldLevel, categoryCount), 0);
+	}
+
+	@NonNull
+	private static String toEmojiSequence(@NonNull Sequences seq, int category, int page) {
+		int categoryCount = Math.max(1, Characters.getMaxEmojiLevel());
+		int normalizedCategory = Math.floorMod(category, categoryCount);
+		int normalizedPage = Math.floorMod(page, getPageCount(normalizedCategory));
+
+		return seq.EMOJI_SEQUENCE + normalizedCategory + normalizedPage;
+	}
+
+	private static int getPageCount(int category) {
+		int size = Characters.getEmoji(category).size();
+		return Math.max(1, (int) Math.ceil(size / (float) PAGE_SIZE));
 	}
 }

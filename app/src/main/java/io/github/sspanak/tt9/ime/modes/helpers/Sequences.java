@@ -52,7 +52,7 @@ public class Sequences {
 		return
 			sequence.equals(CHARS_1_SEQUENCE)
 			|| sequence.equals(CHARS_0_SEQUENCE)
-			|| sequence.equals(EMOJI_SEQUENCE)
+			|| sequence.startsWith(EMOJI_SEQUENCE)
 			|| sequence.equals(PREFERRED_CHAR_SEQUENCE)
 			|| sequence.equals(CHARS_GROUP_0_SEQUENCE)
 			|| sequence.equals(CHARS_GROUP_1_SEQUENCE);

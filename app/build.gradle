@@ -11,6 +11,24 @@ apply from: 'status-icon-tools.gradle'
 apply from: 'version-tools.gradle'
 
 
+
+
+def GENERATED_EMOJI_SOURCE_DIR = layout.buildDirectory.dir('generated/source/emoji/main')
+def UNICODE_EMOJI_TEST_DATA = layout.projectDirectory.file('src/main/unicode/emoji-test.txt')
+
+tasks.register('generateEmojiData') {
+	inputs.file UNICODE_EMOJI_TEST_DATA
+	outputs.dir GENERATED_EMOJI_SOURCE_DIR
+
+	doLast {
+		exec {
+			commandLine 'python3',
+				"${rootDir}/scripts/generate-emoji-data.py",
+				'--source', UNICODE_EMOJI_TEST_DATA.get().asFile.absolutePath,
+				'--output', new File(GENERATED_EMOJI_SOURCE_DIR.get().asFile, 'io/github/sspanak/tt9/util/chars/EmojiDataGenerated.java').absolutePath
+		}
+	}
+}
 tasks.register('validateLanguages') {
 	inputs.dir LANGUAGES_INPUT_DIR
 	outputs.dir LANGUAGE_VALIDATION_DIR
@@ -129,6 +147,11 @@ android {
 			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 		}
 	}
+
+	sourceSets {
+		main.java.srcDir GENERATED_EMOJI_SOURCE_DIR
+	}
+
 	compileOptions {
 		sourceCompatibility JavaVersion.VERSION_17
 		targetCompatibility JavaVersion.VERSION_17
@@ -155,7 +178,9 @@ android {
 
 	applicationVariants.configureEach { variant ->
 		def variantName = variant.name.capitalize()
-		tasks.named("javaPreCompile${variantName}")?.configure {dependsOn(updateStatusIcons) }
+		tasks.named("javaPreCompile${variantName}")?.configure {
+			dependsOn(updateStatusIcons, generateEmojiData)
+		}
 
 		[
 			"merge${variantName}Assets",

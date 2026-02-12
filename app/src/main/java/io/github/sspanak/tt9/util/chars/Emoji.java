@@ -10,37 +10,18 @@ class Emoji extends Punctuation {
 		":)", ":D", ":P", ";)", "\\m/", ":-O", ":|", ":("
 	));
 
-	final private static ArrayList<ArrayList<String>> Emoji = new ArrayList<>(Arrays.asList(
-		// positive
-		new ArrayList<>(Arrays.asList(
-			"🙂", "😀", "🤣", "🤓", "😎", "😛", "😉"
-		)),
-		// negative
-		new ArrayList<>(Arrays.asList(
-			"🙁", "😢", "😭", "😱", "😲", "😳", "😐", "😠"
-		)),
-		// hands
-		new ArrayList<>(Arrays.asList(
-			"👍", "👋", "✌️", "👏", "🖖", "🤘", "🤝", "💪", "👎"
-		)),
-		// emotions
-		new ArrayList<>(Arrays.asList(
-			"❤", "🤗", "😍", "😘", "😇", "😈", "🍺", "🎉", "🥱", "🤔", "🥶", "😬"
-		))
-	));
-
 	public static boolean isGraphic(char ch) {
 		return !(ch < 256 || Character.isLetterOrDigit(ch) || Character.isAlphabetic(ch));
 	}
 
 	public static ArrayList<String> getEmoji(int level) {
-		if (level < 0 || level >= Emoji.size()) {
+		if (level < 0 || level >= EmojiDataGenerated.GROUPS.length) {
 			return new ArrayList<>();
 		}
 
 		Paint paint = new Paint();
 		ArrayList<String> availableEmoji = new ArrayList<>();
-		for (String emoji : Emoji.get(level)) {
+		for (String emoji : EmojiDataGenerated.GROUPS[level]) {
 			if (paint.hasGlyph(emoji)) {
 				availableEmoji.add(emoji);
 			}
@@ -50,13 +31,15 @@ class Emoji extends Punctuation {
 	}
 
 	public static int getMaxEmojiLevel() {
-		return Emoji.size();
+		return EmojiDataGenerated.GROUPS.length;
 	}
 
 	public static boolean isBuiltInEmoji(String emoji) {
-		for (ArrayList<String> group : Emoji) {
-			if (group.contains(emoji)) {
-				return true;
+		for (String[] group : EmojiDataGenerated.GROUPS) {
+			for (String groupedEmoji : group) {
+				if (groupedEmoji.equals(emoji)) {
+					return true;
+				}
 			}
 		}
 

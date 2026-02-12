@@ -159,7 +159,11 @@ class ModeCheonjiin extends InputMode {
 			digitSequence = seq.CHARS_0_SEQUENCE;
 		} else if (number == 1) {
 			disablePredictions = false;
-			digitSequence = seq.CHARS_1_SEQUENCE;
+			if (seq.startsWithEmojiSequence(digitSequence)) {
+				digitSequence = EmojiLanguage.nextEmojiCategory(seq, digitSequence);
+			} else {
+				digitSequence = seq.CHARS_1_SEQUENCE;
+			}
 		} else {
 			autoAcceptTimeout = 0;
 			suggestions.add(language.getKeyNumeral(number));
@@ -241,7 +245,8 @@ class ModeCheonjiin extends InputMode {
 	protected boolean loadEmojis() {
 		if (shouldDisplayEmojis()) {
 			suggestions.clear();
-			suggestions.addAll(new EmojiLanguage(seq).getKeyCharacters(digitSequence.charAt(digitSequence.length() - 1) - '0', getEmojiGroup()));
+			EmojiLanguage emojiLanguage = new EmojiLanguage(seq);
+			suggestions.addAll(emojiLanguage.getKeyCharacters(Sequences.CHARS_1_KEY, getEmojiBrowseState()));
 			return true;
 		}
 
@@ -249,8 +254,9 @@ class ModeCheonjiin extends InputMode {
 	}
 
 
-	protected int getEmojiGroup() {
-		return digitSequence.length() - seq.EMOJI_SEQUENCE.length();
+	@NonNull
+	protected EmojiLanguage.EmojiBrowseState getEmojiBrowseState() {
+		return EmojiLanguage.getBrowseState(seq, digitSequence);
 	}
 
 

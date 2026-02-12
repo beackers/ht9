@@ -80,7 +80,11 @@ public class ModeBopomofo extends ModePinyin {
 			digitSequence = seq.CHARS_0_SEQUENCE;
 		} else if (number == 1) {
 			disablePredictions = false;
-			digitSequence = seq.CHARS_1_SEQUENCE;
+			if (seq.startsWithEmojiSequence(digitSequence)) {
+				digitSequence = EmojiLanguage.nextEmojiCategory(seq, digitSequence);
+			} else {
+				digitSequence = seq.CHARS_1_SEQUENCE;
+			}
 		} else {
 			autoAcceptTimeout = 0;
 			suggestions.add(language.getKeyNumeral(number));

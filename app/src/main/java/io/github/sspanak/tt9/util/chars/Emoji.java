@@ -79,13 +79,15 @@ class Emoji extends Punctuation {
 	}
 
 	public static int getMaxEmojiLevel() {
-		return Emoji.size();
+		return EmojiDataGenerated.GROUPS.length;
 	}
 
 	public static boolean isBuiltInEmoji(String emoji) {
-		for (ArrayList<String> group : Emoji) {
-			if (group.contains(emoji)) {
-				return true;
+		for (String[] group : EmojiDataGenerated.GROUPS) {
+			for (String groupedEmoji : group) {
+				if (groupedEmoji.equals(emoji)) {
+					return true;
+				}
 			}
 		}
 

@@ -24,12 +24,13 @@ public class EmojiLanguage extends Language {
 
 	private final Sequences seq;
 	private final boolean useSimpleLoading;
+	private final boolean preferDownloadedEmoji;
 
 	public EmojiLanguage(Sequences sequences) {
-		this(sequences, true);
+		this(sequences, true, false);
 	}
 
-	public EmojiLanguage(Sequences sequences, boolean useSimpleLoading) {
+	public EmojiLanguage(Sequences sequences, boolean useSimpleLoading, boolean preferDownloadedEmoji) {
 		id = Integer.parseInt(new Sequences().EMOJI_SEQUENCE); // always use the unprefixed sequence for ID
 		locale = Locale.ROOT;
 		abcString = "emoji";
@@ -38,6 +39,7 @@ public class EmojiLanguage extends Language {
 		name = "Emoji";
 		seq = sequences == null ? new Sequences() : sequences;
 		this.useSimpleLoading = useSimpleLoading;
+		this.preferDownloadedEmoji = preferDownloadedEmoji;
 	}
 
 	@NonNull
@@ -52,7 +54,7 @@ public class EmojiLanguage extends Language {
 			return new ArrayList<>();
 		}
 
-		ArrayList<String> categoryItems = Characters.getEmoji(state.category);
+		ArrayList<String> categoryItems = Characters.getEmoji(state.category, useSimpleLoading, preferDownloadedEmoji);
 		if (categoryItems.isEmpty()) {
 			return categoryItems;
 		}
@@ -71,7 +73,12 @@ public class EmojiLanguage extends Language {
 	 */
 	@NonNull
 	public ArrayList<String> getKeyCharacters(int key, int characterGroup) {
-		return key == 1 && characterGroup >= 0 ? Characters.getEmoji(characterGroup, useSimpleLoading) : new ArrayList<>();
+		return key == 1 && characterGroup >= 0 ? Characters.getEmoji(characterGroup, useSimpleLoading, preferDownloadedEmoji) : new ArrayList<>();
+	}
+
+	@NonNull
+	public ArrayList<String> getMenuGroups() {
+		return Characters.getEmojiMenuGroups(preferDownloadedEmoji);
 	}
 
 	@NonNull
@@ -90,12 +97,19 @@ public class EmojiLanguage extends Language {
 			return sequence + next;
 		}
 
-		if (next != Sequences.CHARS_1_KEY) {
-			return sequence;
+		if (sequence.length() == seq.EMOJI_SEQUENCE.length()) {
+			if (next < 1 || next > 9) {
+				return sequence;
+			}
+			return toEmojiSequence(seq, next - 1, 0);
 		}
 
-		EmojiBrowseState state = getBrowseState(seq, sequence);
-		return toEmojiSequence(seq, state.category, state.page + 1);
+		if (next == Sequences.CHARS_1_KEY) {
+			EmojiBrowseState state = getBrowseState(seq, sequence);
+			return toEmojiSequence(seq, state.category, state.page + 1);
+		}
+
+		return sequence;
 	}
 
 	@NonNull
@@ -110,7 +124,7 @@ public class EmojiLanguage extends Language {
 
 	@NonNull
 	public static EmojiBrowseState getBrowseState(@NonNull Sequences seq, @NonNull String sequence) {
-		final int categoryCount = Math.max(1, Characters.getMaxEmojiLevel());
+		final int categoryCount = Math.max(1, Characters.getMaxEmojiLevel(false));
 
 		if (sequence.length() >= seq.EMOJI_SEQUENCE.length() + 2) {
 			int category = sequence.charAt(seq.EMOJI_SEQUENCE.length()) - '0';
@@ -126,7 +140,7 @@ public class EmojiLanguage extends Language {
 
 	@NonNull
 	private static String toEmojiSequence(@NonNull Sequences seq, int category, int page) {
-		int categoryCount = Math.max(1, Characters.getMaxEmojiLevel());
+		int categoryCount = Math.max(1, Characters.getMaxEmojiLevel(false));
 		int normalizedCategory = Math.floorMod(category, categoryCount);
 		int normalizedPage = Math.floorMod(page, getPageCount(normalizedCategory));
 

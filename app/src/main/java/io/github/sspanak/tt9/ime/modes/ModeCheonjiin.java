@@ -254,7 +254,7 @@ class ModeCheonjiin extends InputMode {
 			if (digitSequence.length() == seq.EMOJI_SEQUENCE.length()) {
 				suggestions.addAll(emojiLanguage.getMenuGroups());
 			} else {
-				suggestions.addAll(emojiLanguage.getKeyCharacters(1, getEmojiGroup()));
+				suggestions.addAll(emojiLanguage.getKeyCharacters(1, getEmojiBrowseState()));
 			}
 			return true;
 		}

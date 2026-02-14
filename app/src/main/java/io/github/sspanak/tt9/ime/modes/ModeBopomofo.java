@@ -54,6 +54,11 @@ public class ModeBopomofo extends ModePinyin {
 
 	@Override
 	public boolean onBackspace() {
+		if (seq.startsWithEmojiSequence(digitSequence) && digitSequence.length() > seq.EMOJI_SEQUENCE.length()) {
+			digitSequence = seq.EMOJI_SEQUENCE;
+			return true;
+		}
+
 		if (digitSequence.equals(seq.CHARS_1_SEQUENCE) || digitSequence.equals(seq.CHARS_0_SEQUENCE)) {
 			digitSequence = "";
 			return false;

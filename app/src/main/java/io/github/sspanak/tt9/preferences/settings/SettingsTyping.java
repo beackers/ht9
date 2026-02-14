@@ -82,6 +82,12 @@ class SettingsTyping extends SettingsPunctuation {
 		return getOneKeyEmojiMode() == OneKeyEmojiOptions.OPTIONS.SIMPLE;
 	}
 
+	@NonNull
+	public String getEmojiSource() {
+		String source = prefs.getString("pref_emoji_source", SettingsStore.EMOJI_SOURCE_SYSTEM);
+		return SettingsStore.EMOJI_SOURCE_DOWNLOAD.equals(source) ? SettingsStore.EMOJI_SOURCE_DOWNLOAD : SettingsStore.EMOJI_SOURCE_SYSTEM;
+	}
+
 	public boolean getPredictiveMode() {
 		return prefs.getBoolean("pref_predictive_mode", true);
 	}

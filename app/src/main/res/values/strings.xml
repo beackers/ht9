@@ -128,6 +128,9 @@
 	<string name="pref_one_key_emoji_none">No emojis</string>
 	<string name="pref_one_key_emoji_simple">Brief list</string>
 	<string name="pref_one_key_emoji_full">Full list</string>
+	<string name="pref_emoji_source">Emoji source</string>
+	<string name="pref_emoji_source_system">System font (default)</string>
+	<string name="pref_emoji_source_download">Download list from GitHub</string>
 	<string name="pref_predict_word_pairs">Learn Word Pairs</string>
 	<string name="pref_predict_word_pairs_summary">Remember commonly used phrases to improve the suggestions accuracy.</string>
 	<string name="pref_predictive_auto_accept">Automatic Word Selection</string>

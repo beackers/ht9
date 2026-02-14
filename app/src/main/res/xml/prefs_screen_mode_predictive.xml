@@ -51,4 +51,8 @@
 	<io.github.sspanak.tt9.preferences.screens.modePredictive.DropDownOneKeyEmoji
 		android:dependency="pref_predictive_mode"
 		android:title="@string/pref_one_key_emoji" />
+
+	<io.github.sspanak.tt9.preferences.screens.modePredictive.DropDownEmojiSource
+		android:dependency="pref_predictive_mode"
+		android:title="@string/pref_emoji_source" />
 </androidx.preference.PreferenceScreen>

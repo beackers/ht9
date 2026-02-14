@@ -39,12 +39,3 @@ jobs:
     - name: Build debug APK variants
       if: github.event_name == 'pull_request'
       run: ./gradlew assembleLiteDebug assembleFullDebug
-    - name: Upload debug APK artifact
-      if: github.event_name == 'pull_request'
-      uses: actions/upload-artifact@v4
-      with:
-        name: debug-apk
-        path: |
-          app/build/outputs/apk/lite/debug/*.apk
-          app/build/outputs/apk/full/debug/*.apk
-        if-no-files-found: error
